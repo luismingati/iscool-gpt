@@ -1,1 +1,15 @@
 .env
+
+github-actions-key.json
+terraform-key.json
+
+# Service Account Keys (sensitive)
+*.json
+!.vscode/*.json
+
+# Terraform
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/.terraform.lock.hcl
+terraform/terraform.tfvars
