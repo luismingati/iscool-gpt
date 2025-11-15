@@ -43,7 +43,7 @@ func (c *Client) Close() error {
 }
 
 func (c *Client) GenerateResponse(ctx context.Context, userPrompt string) (string, error) {
-	model := c.genaiClient.GenerativeModel("gemini-2.0-flash-exp")
+	model := c.genaiClient.GenerativeModel("gemini-2.5-flash")
 
 	model.SystemInstruction = &genai.Content{
 		Parts: []genai.Part{genai.Text(systemPrompt)},
