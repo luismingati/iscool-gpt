@@ -1,0 +1,39 @@
+# Git
+.git
+.gitignore
+
+# Environment files (should not be in the image)
+.env
+.env.local
+.env.*.local
+
+# Documentation
+*.md
+!README.md
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Build artifacts
+iscool-gpt
+*.exe
+*.test
+*.out
+
+# Temporary files
+tmp/
+temp/
+*.tmp
