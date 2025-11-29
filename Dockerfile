@@ -10,7 +10,7 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags="-w -s" -o iscool-gpt .
+RUN CGO_ENABLED=0 GOEXPERIMENT=greenteagc GOOS=linux go build -a -ldflags="-w -s" -o iscool-gpt .
 
 FROM scratch
 
