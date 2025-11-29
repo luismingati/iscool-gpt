@@ -35,18 +35,22 @@ func (h *PromptHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ErrorResponse{
+		if err := json.NewEncoder(w).Encode(ErrorResponse{
 			Error: "Invalid JSON: " + err.Error(),
-		})
+		}); err != nil {
+			log.Printf("Error encoding error response: %v", err)
+		}
 		return
 	}
 
 	if req.Prompt == "" {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ErrorResponse{
+		if err := json.NewEncoder(w).Encode(ErrorResponse{
 			Error: "Prompt cannot be empty",
-		})
+		}); err != nil {
+			log.Printf("Error encoding error response: %v", err)
+		}
 		return
 	}
 
@@ -55,15 +59,19 @@ func (h *PromptHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error generating response: %v", err)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(ErrorResponse{
+		if err := json.NewEncoder(w).Encode(ErrorResponse{
 			Error: "Failed to generate response: " + err.Error(),
-		})
+		}); err != nil {
+			log.Printf("Error encoding error response: %v", err)
+		}
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(PromptResponse{
+	if err := json.NewEncoder(w).Encode(PromptResponse{
 		Response: response,
-	})
+	}); err != nil {
+		log.Printf("Error encoding success response: %v", err)
+	}
 }

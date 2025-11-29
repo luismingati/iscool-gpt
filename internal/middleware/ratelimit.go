@@ -25,7 +25,6 @@ func NewRateLimiter(maxRequests int, window time.Duration) *RateLimiter {
 		window:   window,
 	}
 
-	// Start background cleanup goroutine
 	go rl.cleanup()
 
 	return rl
@@ -33,7 +32,6 @@ func NewRateLimiter(maxRequests int, window time.Duration) *RateLimiter {
 
 func (rl *RateLimiter) Limit(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Get client IP
 		ip := r.RemoteAddr
 
 		rl.mu.Lock()
@@ -41,13 +39,11 @@ func (rl *RateLimiter) Limit(next http.Handler) http.Handler {
 
 		now := time.Now()
 
-		// Get existing requests for this IP
 		reqs, exists := rl.requests[ip]
 		if !exists {
 			reqs = []time.Time{}
 		}
 
-		// Filter out requests outside the time window
 		validReqs := []time.Time{}
 		for _, reqTime := range reqs {
 			if now.Sub(reqTime) < rl.window {
@@ -55,26 +51,24 @@ func (rl *RateLimiter) Limit(next http.Handler) http.Handler {
 			}
 		}
 
-		// Check if limit exceeded
 		if len(validReqs) >= rl.maxReqs {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusTooManyRequests)
-			json.NewEncoder(w).Encode(ErrorResponse{
+			if err := json.NewEncoder(w).Encode(ErrorResponse{
 				Error: "Rate limit exceeded. Try again later.",
-			})
+			}); err != nil {
+				http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+			}
 			return
 		}
 
-		// Add current request
 		validReqs = append(validReqs, now)
 		rl.requests[ip] = validReqs
 
-		// Continue to next handler
 		next.ServeHTTP(w, r)
 	})
 }
 
-// cleanup removes old entries periodically
 func (rl *RateLimiter) cleanup() {
 	ticker := time.NewTicker(rl.window)
 	defer ticker.Stop()

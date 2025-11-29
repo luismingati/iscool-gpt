@@ -7,8 +7,6 @@ resource "google_cloud_run_service" "iscool_gpt_staging" {
       service_account_name = google_service_account.cloud_run_sa.email
 
       containers {
-        # This will be updated by GitHub Actions on deployment
-        # Initial placeholder image
         image = "gcr.io/cloudrun/hello"
 
         ports {
@@ -60,7 +58,6 @@ resource "google_cloud_run_service" "iscool_gpt_staging" {
   autogenerate_revision_name = true
 }
 
-# Make the service publicly accessible
 resource "google_cloud_run_service_iam_member" "staging_public_access" {
   service  = google_cloud_run_service.iscool_gpt_staging.name
   location = google_cloud_run_service.iscool_gpt_staging.location
